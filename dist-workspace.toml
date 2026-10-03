@@ -66,8 +66,12 @@ post-announce-jobs = ["./publish-docs", "./publish-versions", "./publish-mirror"
 github-custom-job-permissions = { "build-docker" = { packages = "write", contents = "read", id-token = "write", attestations = "write" }, "publish-crates" = { contents = "read" }, "publish-mirror" = { contents = "read" } }
 # Whether to install an updater program
 install-updater = false
-# Path that installers should place binaries in
-install-path = ["$XDG_BIN_HOME/", "$XDG_DATA_HOME/../bin", "~/.local/bin"]
+# Path that installers should place binaries in.
+# Note: do not use `$XDG_DATA_HOME/../bin` here (see #21837). cargo-dist renders
+# install-path entries verbatim into install.sh, so the `..` is never resolved and
+# later `_install_dir` comparisons (on-PATH check, shadowed-binary check) fail
+# against the canonical paths in `$PATH` and `command -v`.
+install-path = ["$XDG_BIN_HOME/", "~/.local/bin"]
 # Where to host releases
 hosting = ["simple", "github"]
 # A URL to download artifacts from
